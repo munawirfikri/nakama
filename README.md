@@ -1,6 +1,6 @@
 ## MADE Submission ##
 
-[![munawirfikri](https://circleci.com/gh/munawirfikri/nakama.svg?style=svg)](https://circleci.com/gh/munawirfikri/nakama)
+[![munawirfikri](https://circleci.com/gh/munawirfikri/nakama.svg?style=shield)](https://circleci.com/gh/munawirfikri/nakama)
 
 Aplikasi unofficial MyAnimeList (Jikan API) guna menyelesaikan submission pertama modul "Menjadi Android Developer Expert" nya Dicoding.
 
