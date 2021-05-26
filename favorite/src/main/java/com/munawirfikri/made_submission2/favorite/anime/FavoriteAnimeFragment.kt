@@ -15,8 +15,8 @@ import org.koin.core.context.loadKoinModules
 
 class FavoriteAnimeFragment : Fragment() {
 
-    private lateinit var fragmentAnimeBinding: FragmentFavoriteAnimeBinding
-    private lateinit var favAnimeAdapter: FavoriteAnimeAdapter
+    private var fragmentAnimeBinding: FragmentFavoriteAnimeBinding? = null
+    private var favAnimeAdapter: FavoriteAnimeAdapter? = null
 
     private val favViewModel: FavoriteViewModel by viewModel()
 
@@ -29,26 +29,33 @@ class FavoriteAnimeFragment : Fragment() {
         loadKoinModules(favoriteModule)
         fragmentAnimeBinding =
             FragmentFavoriteAnimeBinding.inflate(layoutInflater, container, false)
-        return fragmentAnimeBinding.root
+        return fragmentAnimeBinding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (activity != null) {
             favAnimeAdapter = FavoriteAnimeAdapter()
-            fragmentAnimeBinding.progressBar.visibility = View.VISIBLE
+            fragmentAnimeBinding?.progressBar?.visibility = View.VISIBLE
             favViewModel.getFavoriteAnime.observe(viewLifecycleOwner, { anime ->
-                fragmentAnimeBinding.progressBar.visibility = View.GONE
-                favAnimeAdapter.setData(anime)
-                favAnimeAdapter.notifyDataSetChanged()
+                fragmentAnimeBinding?.progressBar?.visibility = View.GONE
+                favAnimeAdapter?.setData(anime)
+                fragmentAnimeBinding?.viewEmpty?.root?.visibility = if (anime.isNotEmpty()) View.GONE else View.VISIBLE
+                favAnimeAdapter?.notifyDataSetChanged()
             })
 
 
-            with(fragmentAnimeBinding.rvFavMovie) {
-                this.layoutManager = LinearLayoutManager(context)
-                this.setHasFixedSize(true)
-                this.adapter = favAnimeAdapter
+            with(fragmentAnimeBinding?.rvFavMovie) {
+                this?.layoutManager = LinearLayoutManager(context)
+                this?.setHasFixedSize(true)
+                this?.adapter = favAnimeAdapter
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAnimeBinding = null
+        favAnimeAdapter = null
     }
 }

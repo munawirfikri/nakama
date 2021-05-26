@@ -14,31 +14,32 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MangaFragment : Fragment() {
 
-    private lateinit var fragmentMangaBinding: FragmentMangaBinding
+    private var fragmentMangaBinding: FragmentMangaBinding? = null
+    private var mangaAdapter: MangaAdapter? = null
     private val mangaViewModel: MangaViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         fragmentMangaBinding = FragmentMangaBinding.inflate(layoutInflater, container, false)
-        return fragmentMangaBinding.root
+        return fragmentMangaBinding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (activity != null) {
-            val mangaAdapter = MangaAdapter()
+            mangaAdapter = MangaAdapter()
 
 
             mangaViewModel.mangaUseCase.observe(viewLifecycleOwner, { manga ->
                 if (manga != null){
                     when(manga) {
-                        is Resource.Loading -> fragmentMangaBinding.progressBar.visibility = View.VISIBLE
+                        is Resource.Loading -> fragmentMangaBinding?.progressBar?.visibility = View.VISIBLE
                         is Resource.Success -> {
-                            fragmentMangaBinding.progressBar.visibility = View.GONE
-                            mangaAdapter.setData(manga.data)
-                            mangaAdapter.notifyDataSetChanged()
+                            fragmentMangaBinding?.progressBar?.visibility = View.GONE
+                            mangaAdapter?.setData(manga.data)
+                            mangaAdapter?.notifyDataSetChanged()
                         }
                         is Resource.Error -> {
-                            fragmentMangaBinding.progressBar.visibility = View.GONE
+                            fragmentMangaBinding?.progressBar?.visibility = View.GONE
                             Toast.makeText(context, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -46,11 +47,17 @@ class MangaFragment : Fragment() {
 
             })
 
-            with(fragmentMangaBinding.rvManga) {
-                this.layoutManager = GridLayoutManager(context, 3)
-                this.setHasFixedSize(true)
-                this.adapter = mangaAdapter
+            with(fragmentMangaBinding?.rvManga) {
+                this?.layoutManager = GridLayoutManager(context, 3)
+                this?.setHasFixedSize(true)
+                this?.adapter = mangaAdapter
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentMangaBinding = null
+        mangaAdapter = null
     }
 }

@@ -14,29 +14,30 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AnimeFragment : Fragment() {
 
-    private lateinit var fragmentAnimeBinding: FragmentAnimeBinding
+    private var fragmentAnimeBinding: FragmentAnimeBinding? = null
+    private var animeAdapter: AnimeAdapter? = null
     private val animeViewModel: AnimeViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         fragmentAnimeBinding = FragmentAnimeBinding.inflate(layoutInflater, container, false)
-        return fragmentAnimeBinding.root
+        return fragmentAnimeBinding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (activity != null) {
-            val animeAdapter = AnimeAdapter()
+            animeAdapter = AnimeAdapter()
             animeViewModel.animeUseCase.observe(viewLifecycleOwner, {anime ->
                 if (anime != null){
                     when (anime){
-                        is Resource.Loading-> fragmentAnimeBinding.progressBar.visibility = View.VISIBLE
+                        is Resource.Loading-> fragmentAnimeBinding?.progressBar?.visibility = View.VISIBLE
                         is Resource.Success -> {
-                            fragmentAnimeBinding.progressBar.visibility = View.GONE
-                            animeAdapter.setData(anime.data)
-                            animeAdapter.notifyDataSetChanged()
+                            fragmentAnimeBinding?.progressBar?.visibility = View.GONE
+                            animeAdapter?.setData(anime.data)
+                            animeAdapter?.notifyDataSetChanged()
                         }
                         is Resource.Error -> {
-                            fragmentAnimeBinding.progressBar.visibility = View.GONE
+                            fragmentAnimeBinding?.progressBar?.visibility = View.GONE
                             Toast.makeText(context, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -45,11 +46,18 @@ class AnimeFragment : Fragment() {
             })
 
 
-            with(fragmentAnimeBinding.rvAnime) {
-                this.layoutManager = GridLayoutManager(context, 3)
-                this.setHasFixedSize(true)
-                this.adapter = animeAdapter
+            with(fragmentAnimeBinding?.rvAnime) {
+                this?.layoutManager = GridLayoutManager(context, 3)
+                this?.setHasFixedSize(true)
+                this?.adapter = animeAdapter
             }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAnimeBinding = null
+        animeAdapter = null
+    }
+
 }

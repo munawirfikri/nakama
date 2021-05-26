@@ -15,34 +15,41 @@ import org.koin.core.context.loadKoinModules
 
 class FavoriteMangaFragment : Fragment() {
 
-    private lateinit var fragmentMangaBinding: FragmentFavoriteMangaBinding
-    private lateinit var favMangaAdapter: FavoriteMangaAdapter
+    private var fragmentMangaBinding: FragmentFavoriteMangaBinding? = null
+    private var favMangaAdapter: FavoriteMangaAdapter? = null
     private val favViewModel: FavoriteViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         loadKoinModules(favoriteModule)
         fragmentMangaBinding = FragmentFavoriteMangaBinding.inflate(layoutInflater, container, false)
-        return fragmentMangaBinding.root
+        return fragmentMangaBinding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (activity != null) {
             favMangaAdapter = FavoriteMangaAdapter()
-            fragmentMangaBinding.progressBar.visibility = View.VISIBLE
+            fragmentMangaBinding?.progressBar?.visibility = View.VISIBLE
             favViewModel.getFavoriteManga.observe(viewLifecycleOwner, {manga ->
-                fragmentMangaBinding.progressBar.visibility = View.GONE
-                favMangaAdapter.setData(manga)
-                favMangaAdapter.notifyDataSetChanged()
+                fragmentMangaBinding?.progressBar?.visibility = View.GONE
+                favMangaAdapter?.setData(manga)
+                fragmentMangaBinding?.viewEmpty?.root?.visibility = if (manga.isNotEmpty()) View.GONE else View.VISIBLE
+                favMangaAdapter?.notifyDataSetChanged()
             })
 
 
-            with(fragmentMangaBinding.rvFavTvShow) {
-                this.layoutManager = LinearLayoutManager(context)
-                this.setHasFixedSize(true)
-                this.adapter = favMangaAdapter
+            with(fragmentMangaBinding?.rvFavTvShow) {
+                this?.layoutManager = LinearLayoutManager(context)
+                this?.setHasFixedSize(true)
+                this?.adapter = favMangaAdapter
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentMangaBinding = null
+        favMangaAdapter = null
     }
 
 }
